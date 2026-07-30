@@ -225,10 +225,7 @@ export default function AuthModal({ isOpen, onClose, onLoginSuccess }) {
           </button>
         </div>
 
-        {/* Master Admin Hint */}
-        <div className="p-3 bg-[#F8F5EE] dark:bg-zinc-900 rounded-xl text-[11px] text-zinc-500 font-mono text-center">
-          Admin Portal: <strong className="text-[#C8A96A]">admin@gmail.com</strong> | Pass: <strong className="text-[#C8A96A]">admin123</strong>
-        </div>
+
       </motion.div>
     </div>
   );
