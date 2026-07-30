@@ -2,6 +2,15 @@ import { defineSchema, defineTable } from "convex/server";
 import { v } from "convex/values";
 
 export default defineSchema({
+  users: defineTable({
+    name: v.string(),
+    email: v.string(),
+    password: v.string(),
+    role: v.string(), // "farmer", "transporter", "lab", "manufacturer", "admin"
+    phone: v.optional(v.string()),
+    createdAt: v.string(),
+  }),
+
   harvests: defineTable({
     harvestId: v.string(),
     farmerId: v.string(),

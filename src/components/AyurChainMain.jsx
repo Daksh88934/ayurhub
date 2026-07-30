@@ -8,6 +8,7 @@ import HowItWorksSection from '@/components/HowItWorksSection';
 import InteractiveMapSection from '@/components/InteractiveMapSection';
 import TraceabilityTimelineSection from '@/components/TraceabilityTimelineSection';
 import AdminDashboardSection from '@/components/AdminDashboardSection';
+import AuthModal from '@/components/AuthModal';
 
 import FarmerPortal from '@/components/FarmerPortal';
 import TransportPortal from '@/components/TransportPortal';
@@ -36,7 +37,9 @@ import {
   Eye,
   LayoutDashboard,
   Compass,
-  GitCommit
+  User,
+  LogOut,
+  Lock
 } from 'lucide-react';
 
 export default function AyurChainMain() {
@@ -44,6 +47,12 @@ export default function AyurChainMain() {
   const [harvests, setHarvests] = useState([]);
   const [batches, setBatches] = useState([]);
   const [logs, setLogs] = useState([]);
+  
+  // User Authentication & Master Admin State
+  const [currentUser, setCurrentUser] = useState(null);
+  const [registeredUsers, setRegisteredUsers] = useState([]);
+  const [showAuthModal, setShowAuthModal] = useState(false);
+
   const [walletConnected, setWalletConnected] = useState(true);
   const [walletAddress, setWalletAddress] = useState('0x71C...88f2');
   const [showAiGlobalModal, setShowAiGlobalModal] = useState(false);
@@ -58,7 +67,6 @@ export default function AyurChainMain() {
     setBatches(ayurStore.getBatches());
     setLogs(ayurStore.getLogs());
 
-    // Simulate real-time reach increments
     const interval = setInterval(() => {
       setReachCount(prev => prev + Math.floor(1 + Math.random() * 3));
     }, 8000);
@@ -74,6 +82,18 @@ export default function AyurChainMain() {
       setTheme('dark');
       document.documentElement.classList.add('dark');
     }
+  };
+
+  const handleLoginSuccess = (user) => {
+    setCurrentUser(user);
+    if (user.email !== 'admin@gmail.com') {
+      setRegisteredUsers(prev => [user, ...prev]);
+    }
+  };
+
+  const handleLogout = () => {
+    setCurrentUser(null);
+    setActiveTab('home');
   };
 
   const handleHarvestCreated = (newHarvestData) => {
@@ -114,7 +134,7 @@ export default function AyurChainMain() {
 
   return (
     <div className="min-h-screen pb-16 transition-colors duration-300">
-      {/* Top Navbar with Earthy Aesthetics */}
+      {/* Top Navbar */}
       <header className="sticky top-0 z-40 glass-panel border-b border-[#2E7D32]/15 px-4 lg:px-8 py-3.5 flex items-center justify-between">
         <div className="flex items-center gap-3">
           <div 
@@ -131,17 +151,17 @@ export default function AyurChainMain() {
                 Ayur<span className="text-[#2E7D32] dark:text-[#66BB6A]">Chain</span>
               </h1>
               <span className="px-2 py-0.5 text-[10px] font-bold rounded-full bg-[#2E7D32]/10 text-[#2E7D32] dark:text-[#66BB6A] border border-[#2E7D32]/20">
-                Polygon / Convex Live
+                Convex Cloud Live
               </span>
             </div>
             <p className="text-[11px] text-[#4A5568] dark:text-zinc-400 font-medium">Farm-to-Medicine Herbal Provenance</p>
           </div>
         </div>
 
-        {/* Live Reach Metric & Controls */}
+        {/* Live Reach Metric, Auth & Controls */}
         <div className="flex items-center gap-3">
           {/* Live Visitor / Reach Badge */}
-          <div className="hidden lg:flex items-center gap-2 px-3 py-1.5 rounded-2xl bg-[#2E7D32]/10 border border-[#2E7D32]/25 text-[#2E7D32] dark:text-[#66BB6A] text-xs font-bold font-mono">
+          <div className="hidden xl:flex items-center gap-2 px-3 py-1.5 rounded-2xl bg-[#2E7D32]/10 border border-[#2E7D32]/25 text-[#2E7D32] dark:text-[#66BB6A] text-xs font-bold font-mono">
             <span className="w-2 h-2 rounded-full bg-[#43A047] animate-ping" />
             <Eye className="w-3.5 h-3.5" />
             <span>{reachCount.toLocaleString()} Total Reached</span>
@@ -150,44 +170,58 @@ export default function AyurChainMain() {
           <button
             onClick={toggleTheme}
             className="p-2.5 rounded-xl bg-white dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 text-[#1B1B1B] dark:text-zinc-200 hover:scale-105 transition-all shadow-sm"
-            title="Toggle Earthy Light / Dark Mode"
+            title="Toggle Light / Dark Mode"
           >
             {theme === 'dark' ? <Sun className="w-4 h-4 text-[#C8A96A]" /> : <Moon className="w-4 h-4 text-[#2E7D32]" />}
           </button>
 
           <button
             onClick={() => setShowAiGlobalModal(true)}
-            className="hidden sm:flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-[#C8A96A]/15 hover:bg-[#C8A96A]/25 border border-[#C8A96A]/40 text-[#C8A96A] text-xs font-bold transition-all shadow-sm"
+            className="hidden sm:flex items-center gap-1.5 px-3 py-2 rounded-xl bg-[#C8A96A]/15 hover:bg-[#C8A96A]/25 border border-[#C8A96A]/40 text-[#C8A96A] text-xs font-bold transition-all shadow-sm"
           >
             <Sparkles className="w-4 h-4 text-[#C8A96A]" />
-            AyurAI Inspector
+            AI Inspector
           </button>
 
-          <button
-            onClick={toggleWallet}
-            className={`flex items-center gap-2 px-3.5 py-2 rounded-xl border text-xs font-bold transition-all ${
-              walletConnected
-                ? 'bg-[#2E7D32]/10 border-[#2E7D32]/30 text-[#2E7D32] dark:text-[#66BB6A]'
-                : 'bg-white dark:bg-zinc-800 border-zinc-200 dark:border-zinc-700 text-[#1B1B1B] dark:text-zinc-300'
-            }`}
-          >
-            <Wallet className="w-4 h-4 text-[#2E7D32]" />
-            {walletConnected ? (
-              <span className="font-mono">{walletAddress}</span>
-            ) : (
-              'Connect MetaMask'
-            )}
-          </button>
+          {/* User Sign In / Profile Button */}
+          {currentUser ? (
+            <div className="flex items-center gap-2">
+              <div className="px-3 py-1.5 rounded-xl bg-[#2E7D32]/10 border border-[#2E7D32]/30 text-xs font-bold text-[#2E7D32] dark:text-[#66BB6A] flex items-center gap-1.5">
+                <User className="w-3.5 h-3.5" />
+                <span>{currentUser.name}</span>
+                {currentUser.role === 'admin' && (
+                  <span className="px-1.5 py-0.5 rounded bg-[#C8A96A] text-black font-mono text-[9px] font-extrabold uppercase">
+                    ADMIN
+                  </span>
+                )}
+              </div>
+              <button
+                onClick={handleLogout}
+                className="p-2 rounded-xl bg-red-500/10 hover:bg-red-500/20 text-red-500 border border-red-500/30 text-xs font-bold"
+                title="Log Out"
+              >
+                <LogOut className="w-4 h-4" />
+              </button>
+            </div>
+          ) : (
+            <button
+              onClick={() => setShowAuthModal(true)}
+              className="px-4 py-2 bg-gradient-to-r from-[#2E7D32] to-[#43A047] hover:from-[#1B5E20] hover:to-[#2E7D32] text-white font-extrabold rounded-xl text-xs shadow-md transition-all flex items-center gap-1.5"
+            >
+              <User className="w-3.5 h-3.5" />
+              Sign In / Register
+            </button>
+          )}
         </div>
       </header>
 
       {/* Main Container */}
       <main className="max-w-7xl mx-auto px-4 lg:px-8 pt-6 space-y-8">
-        {/* Navigation Tabs Bar */}
+        {/* Clean Public Navigation Bar (Admin tab removed from public view) */}
         <nav className="glass-panel p-2 rounded-2xl border border-zinc-200 dark:border-zinc-800 flex flex-wrap items-center justify-between gap-1 shadow-sm">
           <button
             onClick={() => setActiveTab('home')}
-            className={`flex-1 min-w-[100px] py-2.5 px-3 rounded-xl text-xs font-bold flex items-center justify-center gap-1.5 transition-all ${
+            className={`flex-1 min-w-[90px] py-2.5 px-3 rounded-xl text-xs font-bold flex items-center justify-center gap-1.5 transition-all ${
               activeTab === 'home'
                 ? 'bg-[#2E7D32] text-white shadow-md'
                 : 'text-[#4A5568] dark:text-zinc-400 hover:bg-zinc-100 dark:hover:bg-zinc-900/50'
@@ -198,7 +232,7 @@ export default function AyurChainMain() {
 
           <button
             onClick={() => setActiveTab('farmer')}
-            className={`flex-1 min-w-[100px] py-2.5 px-3 rounded-xl text-xs font-bold flex items-center justify-center gap-1.5 transition-all ${
+            className={`flex-1 min-w-[90px] py-2.5 px-3 rounded-xl text-xs font-bold flex items-center justify-center gap-1.5 transition-all ${
               activeTab === 'farmer'
                 ? 'bg-[#2E7D32] text-white shadow-md'
                 : 'text-[#4A5568] dark:text-zinc-400 hover:bg-zinc-100 dark:hover:bg-zinc-900/50'
@@ -209,7 +243,7 @@ export default function AyurChainMain() {
 
           <button
             onClick={() => setActiveTab('transport')}
-            className={`flex-1 min-w-[100px] py-2.5 px-3 rounded-xl text-xs font-bold flex items-center justify-center gap-1.5 transition-all ${
+            className={`flex-1 min-w-[90px] py-2.5 px-3 rounded-xl text-xs font-bold flex items-center justify-center gap-1.5 transition-all ${
               activeTab === 'transport'
                 ? 'bg-[#43A047] text-white shadow-md'
                 : 'text-[#4A5568] dark:text-zinc-400 hover:bg-zinc-100 dark:hover:bg-zinc-900/50'
@@ -220,18 +254,18 @@ export default function AyurChainMain() {
 
           <button
             onClick={() => setActiveTab('lab')}
-            className={`flex-1 min-w-[100px] py-2.5 px-3 rounded-xl text-xs font-bold flex items-center justify-center gap-1.5 transition-all ${
+            className={`flex-1 min-w-[90px] py-2.5 px-3 rounded-xl text-xs font-bold flex items-center justify-center gap-1.5 transition-all ${
               activeTab === 'lab'
                 ? 'bg-purple-600 text-white shadow-md'
                 : 'text-[#4A5568] dark:text-zinc-400 hover:bg-zinc-100 dark:hover:bg-zinc-900/50'
             }`}
           >
-            <TestTube2 className="w-3.5 h-3.5" /> 3. Quality Lab
+            <TestTube2 className="w-3.5 h-3.5" /> 3. Lab
           </button>
 
           <button
             onClick={() => setActiveTab('manufacturer')}
-            className={`flex-1 min-w-[100px] py-2.5 px-3 rounded-xl text-xs font-bold flex items-center justify-center gap-1.5 transition-all ${
+            className={`flex-1 min-w-[90px] py-2.5 px-3 rounded-xl text-xs font-bold flex items-center justify-center gap-1.5 transition-all ${
               activeTab === 'manufacturer'
                 ? 'bg-[#C8A96A] text-[#1B1B1B] font-extrabold shadow-md'
                 : 'text-[#4A5568] dark:text-zinc-400 hover:bg-zinc-100 dark:hover:bg-zinc-900/50'
@@ -242,7 +276,7 @@ export default function AyurChainMain() {
 
           <button
             onClick={() => setActiveTab('consumer')}
-            className={`flex-1 min-w-[110px] py-2.5 px-3 rounded-xl text-xs font-extrabold flex items-center justify-center gap-1.5 transition-all ${
+            className={`flex-1 min-w-[100px] py-2.5 px-3 rounded-xl text-xs font-extrabold flex items-center justify-center gap-1.5 transition-all ${
               activeTab === 'consumer'
                 ? 'bg-gradient-to-r from-[#2E7D32] to-[#43A047] text-white shadow-lg'
                 : 'text-[#2E7D32] dark:text-[#66BB6A] hover:bg-[#2E7D32]/10'
@@ -260,17 +294,6 @@ export default function AyurChainMain() {
             }`}
           >
             <Compass className="w-3.5 h-3.5" /> Live Map
-          </button>
-
-          <button
-            onClick={() => setActiveTab('admin')}
-            className={`py-2.5 px-3 rounded-xl text-xs font-bold flex items-center justify-center gap-1.5 transition-all ${
-              activeTab === 'admin'
-                ? 'bg-[#2E7D32] text-white shadow-md'
-                : 'text-[#4A5568] dark:text-zinc-400 hover:bg-zinc-100 dark:hover:bg-zinc-900/50'
-            }`}
-          >
-            <LayoutDashboard className="w-3.5 h-3.5" /> Admin
           </button>
 
           <button
@@ -294,6 +317,20 @@ export default function AyurChainMain() {
           >
             <Database className="w-3.5 h-3.5 text-[#43A047]" /> Ledger
           </button>
+
+          {/* Admin Panel Tab ONLY renders if logged in as admin@gmail.com */}
+          {currentUser && currentUser.role === 'admin' && (
+            <button
+              onClick={() => setActiveTab('admin')}
+              className={`py-2.5 px-3.5 rounded-xl text-xs font-extrabold flex items-center justify-center gap-1.5 transition-all ${
+                activeTab === 'admin'
+                  ? 'bg-amber-600 text-white shadow-lg'
+                  : 'bg-[#C8A96A]/20 text-[#C8A96A] hover:bg-[#C8A96A]/30'
+              }`}
+            >
+              <Lock className="w-3.5 h-3.5" /> Admin Control
+            </button>
+          )}
         </nav>
 
         {/* Dynamic Animated Content Panel */}
@@ -365,8 +402,8 @@ export default function AyurChainMain() {
               <InteractiveMapSection harvests={harvests} />
             )}
 
-            {activeTab === 'admin' && (
-              <AdminDashboardSection harvests={harvests} batches={batches} logs={logs} />
+            {activeTab === 'admin' && currentUser && currentUser.role === 'admin' && (
+              <AdminDashboardSection harvests={harvests} batches={batches} logs={logs} users={registeredUsers} />
             )}
 
             {activeTab === 'analytics' && (
@@ -383,6 +420,13 @@ export default function AyurChainMain() {
           </motion.div>
         </AnimatePresence>
       </main>
+
+      {/* Authentication Modal */}
+      <AuthModal 
+        isOpen={showAuthModal}
+        onClose={() => setShowAuthModal(false)}
+        onLoginSuccess={handleLoginSuccess}
+      />
 
       <AIInspectorModal 
         isOpen={showAiGlobalModal} 

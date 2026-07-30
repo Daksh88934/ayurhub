@@ -1,6 +1,69 @@
 import { query, mutation } from "./_generated/server";
 import { v } from "convex/values";
 
+// --- AUTHENTICATION MUTATIONS & QUERIES ---
+export const registerUser = mutation({
+  args: {
+    name: v.string(),
+    email: v.string(),
+    password: v.string(),
+    role: v.string(),
+    phone: v.optional(v.string())
+  },
+  handler: async (ctx, args) => {
+    const existing = await ctx.db
+      .query("users")
+      .filter((q) => q.eq(q.field("email"), args.email))
+      .first();
+
+    if (existing) {
+      throw new Error("User with this email already exists");
+    }
+
+    const userId = await ctx.db.insert("users", {
+      ...args,
+      createdAt: new Date().toISOString()
+    });
+
+    return { userId, email: args.email, name: args.name, role: args.role };
+  }
+});
+
+export const loginUser = query({
+  args: {
+    email: v.string(),
+    password: v.string()
+  },
+  handler: async (ctx, args) => {
+    // Admin Master Account
+    if (args.email.trim() === "admin@gmail.com" && args.password.trim() === "admin123") {
+      return {
+        _id: "admin-master",
+        name: "AyurChain System Administrator",
+        email: "admin@gmail.com",
+        role: "admin"
+      };
+    }
+
+    const user = await ctx.db
+      .query("users")
+      .filter((q) => q.eq(q.field("email"), args.email))
+      .first();
+
+    if (!user || user.password !== args.password) {
+      return null;
+    }
+
+    return user;
+  }
+});
+
+export const getAllUsers = query({
+  handler: async (ctx) => {
+    return await ctx.db.query("users").order("desc").collect();
+  }
+});
+
 // --- HARVESTS ---
 export const getHarvests = query({
   handler: async (ctx) => {
@@ -179,39 +242,4 @@ export const getLogs = query({
   handler: async (ctx) => {
     return await ctx.db.query("logs").order("desc").collect();
   },
-});
-
-// --- ANALYTICS REACH COUNTER ---
-export const incrementReachCounter = mutation({
-  handler: async (ctx) => {
-    const record = await ctx.db.query("analytics").first();
-    if (record) {
-      await ctx.db.patch(record._id, {
-        totalVisits: record.totalVisits + 1,
-        totalConsumerScans: record.totalConsumerScans + 1
-      });
-    } else {
-      await ctx.db.insert("analytics", {
-        totalVisits: 12850,
-        totalConsumerScans: 8420,
-        activeFarmers: 142,
-        totalHarvestKg: 18450
-      });
-    }
-  }
-});
-
-export const getAnalytics = query({
-  handler: async (ctx) => {
-    const record = await ctx.db.query("analytics").first();
-    if (!record) {
-      return {
-        totalVisits: 12850,
-        totalConsumerScans: 8420,
-        activeFarmers: 142,
-        totalHarvestKg: 18450
-      };
-    }
-    return record;
-  }
 });
