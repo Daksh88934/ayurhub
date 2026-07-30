@@ -35,7 +35,6 @@ export default function AuthModal({ isOpen, onClose, onLoginSuccess }) {
           return;
         }
 
-        // Real Convex Database Mutation Execution
         try {
           await registerUserMutation({
             name,
@@ -44,7 +43,7 @@ export default function AuthModal({ isOpen, onClose, onLoginSuccess }) {
             role
           });
         } catch (dbErr) {
-          console.log("Convex DB insert notification:", dbErr);
+          console.log("Database response:", dbErr);
         }
 
         const newUser = {
@@ -57,11 +56,11 @@ export default function AuthModal({ isOpen, onClose, onLoginSuccess }) {
 
         triggerGoogleWelcomeNotification(name, email);
 
-        setToastMessage(`Welcome to AyurChain, ${name}! Your account is immutably saved in Convex Cloud Database.`);
+        setToastMessage(`Welcome to AyurChain, ${name}! Your account is now active.`);
         setTimeout(() => {
           onLoginSuccess(newUser);
           onClose();
-        }, 1200);
+        }, 1000);
       } else {
         if (email.trim() === 'admin@gmail.com' && password.trim() === 'admin123') {
           const adminUser = {
@@ -87,18 +86,18 @@ export default function AuthModal({ isOpen, onClose, onLoginSuccess }) {
           onLoginSuccess(user);
           onClose();
         } else {
-          setErrorMessage('Invalid credentials. Please try again.');
+          setErrorMessage('Invalid email or password. Please try again.');
         }
       }
     } catch (err) {
-      setErrorMessage(err.message || 'Authentication error.');
+      setErrorMessage(err.message || 'Authentication failed.');
     } finally {
       setIsSubmitting(false);
     }
   };
 
   const triggerGoogleWelcomeNotification = (userName, targetEmail) => {
-    console.log(`[Google Notification API] Dispatching alert to ${targetEmail}: "You have logged in to AyurHub."`);
+    console.log(`[Notification API] Dispatching login confirmation alert to ${targetEmail}`);
   };
 
   return (
@@ -109,6 +108,7 @@ export default function AuthModal({ isOpen, onClose, onLoginSuccess }) {
         exit={{ opacity: 0, scale: 0.95 }}
         className="relative w-full max-w-md glass-panel p-8 rounded-3xl border border-[#2E7D32]/30 shadow-2xl space-y-6"
       >
+        {/* Header */}
         <div className="flex items-center justify-between border-b border-zinc-200 dark:border-zinc-800 pb-4">
           <div className="flex items-center gap-3">
             <div className="p-2.5 rounded-2xl bg-[#2E7D32]/10 border border-[#2E7D32]/30 text-[#2E7D32]">
@@ -116,10 +116,10 @@ export default function AuthModal({ isOpen, onClose, onLoginSuccess }) {
             </div>
             <div>
               <h2 className="text-xl font-bold text-[#1B1B1B] dark:text-white">
-                {isRegister ? 'Create AyurChain Account' : 'Portal Sign In'}
+                {isRegister ? 'Create Account' : 'Welcome Back'}
               </h2>
               <p className="text-xs text-[#4A5568] dark:text-zinc-400">
-                {isRegister ? 'Register user account directly in Convex Cloud DB' : 'Sign in to access AyurChain tools'}
+                {isRegister ? 'Enter your details to register on AyurChain' : 'Sign in to access your dashboard'}
               </p>
             </div>
           </div>
@@ -133,7 +133,7 @@ export default function AuthModal({ isOpen, onClose, onLoginSuccess }) {
         )}
 
         {toastMessage && (
-          <div className="p-3 rounded-xl bg-[#43A047]/10 border border-[#43A047]/30 text-[#43A047] text-xs flex items-center gap-2">
+          <div className="p-3 rounded-xl bg-[#43A047]/10 border border-[#43A047]/30 text-[#43A047] text-xs flex items-center gap-2 font-medium">
             <CheckCircle2 className="w-4 h-4" /> {toastMessage}
           </div>
         )}
@@ -141,7 +141,7 @@ export default function AuthModal({ isOpen, onClose, onLoginSuccess }) {
         <form onSubmit={handleSubmit} className="space-y-4">
           {isRegister && (
             <div>
-              <label className="block text-xs font-semibold text-[#1B1B1B] dark:text-zinc-200 mb-1">Full Name *</label>
+              <label className="block text-xs font-semibold text-[#1B1B1B] dark:text-zinc-200 mb-1">Full Name</label>
               <div className="relative">
                 <User className="w-4 h-4 text-zinc-400 absolute left-3 top-1/2 -translate-y-1/2" />
                 <input 
@@ -157,13 +157,13 @@ export default function AuthModal({ isOpen, onClose, onLoginSuccess }) {
           )}
 
           <div>
-            <label className="block text-xs font-semibold text-[#1B1B1B] dark:text-zinc-200 mb-1">Email Address *</label>
+            <label className="block text-xs font-semibold text-[#1B1B1B] dark:text-zinc-200 mb-1">Email Address</label>
             <div className="relative">
               <Mail className="w-4 h-4 text-zinc-400 absolute left-3 top-1/2 -translate-y-1/2" />
               <input 
                 type="email"
                 required
-                placeholder="e.g. farmer@gmail.com or admin@gmail.com"
+                placeholder="name@company.com"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 className="w-full bg-white dark:bg-zinc-950 border border-zinc-300 dark:border-zinc-800 rounded-xl pl-10 pr-4 py-2.5 text-sm focus:outline-none focus:border-[#2E7D32]"
@@ -172,7 +172,7 @@ export default function AuthModal({ isOpen, onClose, onLoginSuccess }) {
           </div>
 
           <div>
-            <label className="block text-xs font-semibold text-[#1B1B1B] dark:text-zinc-200 mb-1">Password *</label>
+            <label className="block text-xs font-semibold text-[#1B1B1B] dark:text-zinc-200 mb-1">Password</label>
             <div className="relative">
               <Lock className="w-4 h-4 text-zinc-400 absolute left-3 top-1/2 -translate-y-1/2" />
               <input 
@@ -188,15 +188,15 @@ export default function AuthModal({ isOpen, onClose, onLoginSuccess }) {
 
           {isRegister && (
             <div>
-              <label className="block text-xs font-semibold text-[#1B1B1B] dark:text-zinc-200 mb-1">Select Role</label>
+              <label className="block text-xs font-semibold text-[#1B1B1B] dark:text-zinc-200 mb-1">Account Role</label>
               <select 
                 value={role}
                 onChange={(e) => setRole(e.target.value)}
                 className="w-full bg-white dark:bg-zinc-950 border border-zinc-300 dark:border-zinc-800 rounded-xl px-3.5 py-2.5 text-sm focus:outline-none focus:border-[#2E7D32]"
               >
-                <option value="farmer">Farmer / Grower</option>
-                <option value="transporter">Logistics Transporter</option>
-                <option value="lab">Quality Testing Chemist</option>
+                <option value="farmer">Farmer / Herbalist</option>
+                <option value="transporter">Logistics Partner</option>
+                <option value="lab">Quality Control Lab</option>
                 <option value="manufacturer">Medicine Manufacturer</option>
               </select>
             </div>
@@ -207,7 +207,7 @@ export default function AuthModal({ isOpen, onClose, onLoginSuccess }) {
             disabled={isSubmitting}
             className="w-full py-3.5 bg-gradient-to-r from-[#2E7D32] to-[#43A047] hover:from-[#1B5E20] hover:to-[#2E7D32] text-white font-extrabold rounded-2xl shadow-lg transition-all flex items-center justify-center gap-2"
           >
-            {isSubmitting ? 'Authenticating & Saving to Convex...' : isRegister ? 'Register & Save to Convex DB' : 'Sign In'}
+            {isSubmitting ? 'Authenticating...' : isRegister ? 'Create Account' : 'Sign In'}
             <ArrowRight className="w-4 h-4" />
           </button>
         </form>
@@ -225,8 +225,9 @@ export default function AuthModal({ isOpen, onClose, onLoginSuccess }) {
           </button>
         </div>
 
-        <div className="p-3 bg-zinc-100 dark:bg-zinc-900 rounded-xl text-[11px] text-zinc-500 font-mono text-center">
-          Admin Login: <strong className="text-[#C8A96A]">admin@gmail.com</strong> | Pass: <strong className="text-[#C8A96A]">admin123</strong>
+        {/* Master Admin Hint */}
+        <div className="p-3 bg-[#F8F5EE] dark:bg-zinc-900 rounded-xl text-[11px] text-zinc-500 font-mono text-center">
+          Admin Portal: <strong className="text-[#C8A96A]">admin@gmail.com</strong> | Pass: <strong className="text-[#C8A96A]">admin123</strong>
         </div>
       </motion.div>
     </div>
