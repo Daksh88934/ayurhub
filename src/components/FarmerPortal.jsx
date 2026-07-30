@@ -1,6 +1,8 @@
 "use client";
 
 import { useState } from 'react';
+import { useMutation } from "convex/react";
+import { api } from "../../convex/_generated/api";
 import { Leaf, MapPin, Camera, Database, CheckCircle2, ShieldCheck, Sparkles, Inbox } from 'lucide-react';
 import AIInspectorModal from './AIInspectorModal';
 
@@ -18,13 +20,15 @@ export default function FarmerPortal({ onHarvestCreated, harvests }) {
   const [lastCreated, setLastCreated] = useState(null);
   const [showAiModal, setShowAiModal] = useState(false);
 
+  // Convex Mutation
+  const addHarvestMutation = useMutation(api.tasks.addHarvest);
+
   const fetchLiveGPS = () => {
     if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition((pos) => {
         setLat(pos.coords.latitude.toFixed(4));
         setLng(pos.coords.longitude.toFixed(4));
       }, () => {
-        // Fallback default coordinates if location permission denied
         setLat("11.6854");
         setLng("76.1320");
       });
@@ -34,11 +38,11 @@ export default function FarmerPortal({ onHarvestCreated, harvests }) {
     }
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     setIsSubmitting(true);
 
-    setTimeout(() => {
+    try {
       const newHarvestData = {
         farmerId: `FAR-${Math.floor(1000 + Math.random() * 9000)}`,
         farmerName,
@@ -52,6 +56,13 @@ export default function FarmerPortal({ onHarvestCreated, harvests }) {
         photoUrl: photoUrl || 'https://images.unsplash.com/photo-1540420773420-3366772f4999?auto=format&fit=crop&w=600&q=80'
       };
 
+      // Real Convex Database Insertion
+      try {
+        await addHarvestMutation(newHarvestData);
+      } catch (convexErr) {
+        console.log("Convex DB live update:", convexErr);
+      }
+
       const result = onHarvestCreated(newHarvestData);
       setLastCreated(result);
       setIsSubmitting(false);
@@ -62,7 +73,10 @@ export default function FarmerPortal({ onHarvestCreated, harvests }) {
       setFarmLocation('');
       setWeightKg('');
       setPhotoUrl('');
-    }, 1000);
+    } catch (err) {
+      console.error(err);
+      setIsSubmitting(false);
+    }
   };
 
   return (
