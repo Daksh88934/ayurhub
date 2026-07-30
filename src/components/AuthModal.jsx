@@ -56,7 +56,7 @@ export default function AuthModal({ isOpen, onClose, onLoginSuccess }) {
 
         triggerGoogleWelcomeNotification(name, email);
 
-        setToastMessage(`Welcome to AyurChain, ${name}! Your account is now active.`);
+        setToastMessage(`Welcome, ${name}! Your account has been created successfully.`);
         setTimeout(() => {
           onLoginSuccess(newUser);
           onClose();
@@ -207,7 +207,7 @@ export default function AuthModal({ isOpen, onClose, onLoginSuccess }) {
             disabled={isSubmitting}
             className="w-full py-3.5 bg-gradient-to-r from-[#2E7D32] to-[#43A047] hover:from-[#1B5E20] hover:to-[#2E7D32] text-white font-extrabold rounded-2xl shadow-lg transition-all flex items-center justify-center gap-2"
           >
-            {isSubmitting ? 'Authenticating...' : isRegister ? 'Create Account' : 'Sign In'}
+            {isSubmitting ? 'Please wait...' : isRegister ? 'Create Account' : 'Sign In'}
             <ArrowRight className="w-4 h-4" />
           </button>
         </form>

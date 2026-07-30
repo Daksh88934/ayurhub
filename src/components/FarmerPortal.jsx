@@ -224,14 +224,14 @@ export default function FarmerPortal({ onHarvestCreated, harvests }) {
               className="w-full py-3.5 bg-gradient-to-r from-[#2E7D32] to-[#43A047] hover:from-[#1B5E20] hover:to-[#2E7D32] text-white font-extrabold rounded-2xl shadow-lg glow-forest transition-all flex items-center justify-center gap-2"
             >
               {isSubmitting ? (
-                <>
+                <>                  
                   <Database className="w-5 h-5 animate-spin" />
-                  Saving to Convex Cloud DB & Blockchain...
+                  Saving your harvest...
                 </>
               ) : (
                 <>
                   <ShieldCheck className="w-5 h-5" />
-                  Save & Mint Harvest Record
+                  Submit Harvest Record
                 </>
               )}
             </button>

@@ -29,9 +29,9 @@ export default function HeroSection({ onGetStarted, onScanClick }) {
           transition={{ duration: 0.5 }}
           className="lg:col-span-7 space-y-6"
         >
-          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#2E7D32]/10 border border-[#2E7D32]/25 text-[#2E7D32] dark:text-[#66BB6A] text-xs font-bold font-mono">
+          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#2E7D32]/10 border border-[#2E7D32]/25 text-[#2E7D32] dark:text-[#66BB6A] text-xs font-bold">
             <Sprout className="w-4 h-4 animate-bounce text-[#43A047]" />
-            Blockchain + Geo-Tagging + AI Powered Herbal Provenance
+            Blockchain · Geo-Tagging · AI Verified
           </div>
 
           <h1 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight text-[#1B1B1B] dark:text-white leading-[1.15]">
@@ -48,7 +48,7 @@ export default function HeroSection({ onGetStarted, onScanClick }) {
               onClick={onGetStarted}
               className="px-7 py-3.5 bg-gradient-to-r from-[#2E7D32] to-[#43A047] hover:from-[#1B5E20] hover:to-[#2E7D32] text-white font-extrabold rounded-2xl shadow-xl glow-forest transition-all flex items-center gap-2"
             >
-              Get Started (Launch Workflow)
+              Get Started
               <ArrowRight className="w-5 h-5" />
             </button>
 

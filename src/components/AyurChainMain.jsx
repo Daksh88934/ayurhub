@@ -148,13 +148,14 @@ export default function AyurChainMain() {
           <div onClick={() => setActiveTab('home')} className="cursor-pointer">
             <div className="flex items-center gap-2">
               <h1 className="text-xl font-extrabold tracking-tight font-sans text-[#1B1B1B] dark:text-white">
-                Ayur<span className="text-[#2E7D32] dark:text-[#66BB6A]">Chain</span>
+                Ayur<span className="text-[#2E7D32] dark:text-[#66BB6A]">Hub</span>
               </h1>
-              <span className="px-2 py-0.5 text-[10px] font-bold rounded-full bg-[#2E7D32]/10 text-[#2E7D32] dark:text-[#66BB6A] border border-[#2E7D32]/20">
-                Convex Cloud Live
+              <span className="px-2 py-0.5 text-[10px] font-bold rounded-full bg-[#43A047]/10 text-[#43A047] border border-[#43A047]/20 flex items-center gap-1">
+                <span className="w-1.5 h-1.5 rounded-full bg-[#43A047] animate-pulse inline-block" />
+                Live
               </span>
             </div>
-            <p className="text-[11px] text-[#4A5568] dark:text-zinc-400 font-medium">Farm-to-Medicine Herbal Provenance</p>
+            <p className="text-[11px] text-[#4A5568] dark:text-zinc-400 font-medium">Ayurvedic Herb Provenance Platform</p>
           </div>
         </div>
 
@@ -187,18 +188,20 @@ export default function AyurChainMain() {
           {currentUser ? (
             <div className="flex items-center gap-2">
               <div className="px-3 py-1.5 rounded-xl bg-[#2E7D32]/10 border border-[#2E7D32]/30 text-xs font-bold text-[#2E7D32] dark:text-[#66BB6A] flex items-center gap-1.5">
-                <User className="w-3.5 h-3.5" />
-                <span>{currentUser.name}</span>
+                <div className="w-6 h-6 rounded-full bg-gradient-to-br from-[#2E7D32] to-[#43A047] flex items-center justify-center text-white text-[10px] font-black">
+                  {currentUser.name?.charAt(0).toUpperCase()}
+                </div>
+                <span className="max-w-[100px] truncate">{currentUser.name}</span>
                 {currentUser.role === 'admin' && (
                   <span className="px-1.5 py-0.5 rounded bg-[#C8A96A] text-black font-mono text-[9px] font-extrabold uppercase">
-                    ADMIN
+                    Admin
                   </span>
                 )}
               </div>
               <button
                 onClick={handleLogout}
-                className="p-2 rounded-xl bg-red-500/10 hover:bg-red-500/20 text-red-500 border border-red-500/30 text-xs font-bold"
-                title="Log Out"
+                className="p-2 rounded-xl bg-zinc-100 hover:bg-red-50 dark:bg-zinc-800 dark:hover:bg-red-900/20 text-zinc-500 hover:text-red-500 border border-zinc-200 dark:border-zinc-700 transition-all"
+                title="Sign Out"
               >
                 <LogOut className="w-4 h-4" />
               </button>
